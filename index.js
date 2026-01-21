@@ -16,6 +16,8 @@ app.engine('hbs',hbs.engine({
     useLayoutDir: __dirname + '/views/Layouts/'
 }))
 
+app.use(express.static('puplic'))
+
 connectToDB = async (connectionString) =>{
     try{
         const client = await mongodb.connect(connectionString);
