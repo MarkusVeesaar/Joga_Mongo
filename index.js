@@ -2,18 +2,17 @@ const express = require("express")
 const mongodb = require("mongodb").MongoClient
 const dotenv = require("dotenv")
 dotenv.config()
-const hbs = require('express.handlebars')
+const hbs = require('express-handlebars')
 const path = require('path')
-const { useLayoutEffect } = require("react")
 
 const app = express()
 
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine','hbs')
-app.engine('hbs',hbs.engine({
+app.engine('hbs', hbs.engine({
     extname: 'hbs',
     defaultLayout: 'main',
-    useLayoutDir: __dirname + '/views/Layouts/'
+    layoutDir: __dirname + '/views/layouts/'
 }))
 
 app.use(express.static('puplic'))
@@ -38,6 +37,12 @@ const dbname = process.env.MONGO_DATABASE
 
 let db, connectionString = `mongodb://${user}:${password}@${host}:${port}/${dbname}`
 db = connectToDB(connectionString);
+
+app.get('/', async (req, res) => {
+  const articles = await (await db).collection('articles').find().toArray()
+  console.log(articles)
+  res.render('index', {articles: articles})
+})
 
 app.listen(3012, () =>{
     console.log("Server is running on port 3012")
