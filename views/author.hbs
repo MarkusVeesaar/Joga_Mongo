@@ -1,0 +1,15 @@
+{{#author}}
+  <h1>{{name}}</h1>
+
+  <ul>
+  <div class="article-list">
+  {{#articles}}
+    <article>
+      <a href="/article/{{slug}}">
+        <img src="/images/{{image}}" />
+      </a>
+    </article>
+  {{/articles}}
+  </div>
+  </ul>
+{{/author}}

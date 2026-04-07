@@ -14,7 +14,7 @@ app.engine(
   hbs.engine({
     extname: "hbs",
     defaultLayout: "main",
-    layoutDir: __dirname + "/views/layouts/",
+    layoutsDir: __dirname + "/views/layouts/",
   }),
 );
 
@@ -53,12 +53,15 @@ app.get("/article/:slug", async (req, res) => {
   const articleResult = await (await db).collection("articles").findOne({ slug: req.params.slug });
   const AuthorResult = await (await db).collection("authors").findOne({ _id: articleResult.author_id });
   articleResult.author = AuthorResult;
-  res.render("article_tmpl", {
-    article: articleResult
-  });
-
+  res.render("article_tmpl", {article: articleResult});
 });
 
+app.get("/author/:name", async (req, res) => {
+  const authorResult = await (await db).collection("authors").findOne({ name: req.params.name });
+  const articlesResult = await (await db).collection("articles").find({ author_id: authorResult._id }).toArray();
+  authorResult.articles = articlesResult;
+  res.render("author", {author: authorResult});
+});
 
 app.listen(3012, () => {
   console.log("Server is running on port 3012");
