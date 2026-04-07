@@ -38,7 +38,8 @@ const port = process.env.MONGO_PORT;
 const dbname = process.env.MONGO_DATABASE;
 
 let db,
-  connectionString = `mongodb://${user}:${password}@${host}:${port}/${dbname}`;
+  connectionString = `mongodb://${user}:${password}@${host}:${port}/${dbname}?authSource=${dbname}`;
+  console.log("Connection string:", connectionString);
 db = connectToDB(connectionString);
 
 app.get("/", async (req, res) => {
@@ -50,9 +51,14 @@ app.get("/", async (req, res) => {
 
 app.get("/article/:slug", async (req, res) => {
   const articleResult = await (await db).collection("articles").findOne({ slug: req.params.slug });
-  console.log("Article:", articleResult);
-  res.render("article_tmpl", {article: articleResult,});
+  const AuthorResult = await (await db).collection("authors").findOne({ _id: articleResult.author_id });
+  articleResult.author = AuthorResult;
+  res.render("article_tmpl", {
+    article: articleResult
+  });
+
 });
+
 
 app.listen(3012, () => {
   console.log("Server is running on port 3012");
